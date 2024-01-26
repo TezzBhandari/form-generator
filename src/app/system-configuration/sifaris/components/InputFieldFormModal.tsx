@@ -25,6 +25,20 @@ export interface InputFieldFormModalProps {
     inputRowIndex: number;
 }
 
+// random id generator
+function generateUniqueId(): string {
+    // Generate a timestamp (number of milliseconds since the Unix epoch)
+    const timestamp = new Date().getTime();
+
+    // Generate a random number between 0 and 9999
+    const random = Math.floor(Math.random() * 10000);
+
+    // Combine timestamp and random number to create a unique ID
+    const uniqueId = `${timestamp}${random}`;
+
+    return uniqueId;
+}
+
 
 // COMPONENT
 const InputFieldFormModal = ({
@@ -33,9 +47,6 @@ const InputFieldFormModal = ({
     groupIndex,
     inputRowIndex
 }: InputFieldFormModalProps) => {
-
-    // unique id for each string
-    const inputId = useId();
 
     // form create form context accessor
     const { control: formCreatorControl } = useFormContext<CreateSifarisForm>();
@@ -50,8 +61,8 @@ const InputFieldFormModal = ({
         defaultValues: {
             type: "text",
             name: "",
-            id: "",
             label: "",
+            id: generateUniqueId(),
             required:
                 false,
             placeholder: ""
@@ -59,8 +70,8 @@ const InputFieldFormModal = ({
     });
 
     useEffect(() => {
-        setValue(`id`, inputId)
-    }, [])
+        setValue(`id`, generateUniqueId())
+    }, [generateUniqueId])
 
     // data to show in type dropdown list
     const InputTypeList: FieldSchema["type"][] = [

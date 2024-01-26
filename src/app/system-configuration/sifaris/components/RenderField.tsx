@@ -59,11 +59,12 @@ const data2: Array<InputRow> = [
 ];
 
 // renders input field
-function renderField([name, fieldAttribute]: [string, Field]) {
+function renderField([name, fieldAttribute]: [string, Field], fieldIndex: number) {
+  console.log('fieldIndex: ', fieldIndex)
   if (fieldAttribute.type === "text") {
     return (
       <TextField
-        key={fieldAttribute.id}
+        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />
@@ -73,7 +74,7 @@ function renderField([name, fieldAttribute]: [string, Field]) {
   if (fieldAttribute.type === "number") {
     return (
       <NumberField
-        key={fieldAttribute.id}
+        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />
@@ -83,7 +84,7 @@ function renderField([name, fieldAttribute]: [string, Field]) {
   if (fieldAttribute.type === "email") {
     return (
       <EmailField
-        key={fieldAttribute.id}
+        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />
@@ -93,7 +94,7 @@ function renderField([name, fieldAttribute]: [string, Field]) {
   if (fieldAttribute.type === "date") {
     return (
       <DateField
-        key={fieldAttribute.id}
+        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />

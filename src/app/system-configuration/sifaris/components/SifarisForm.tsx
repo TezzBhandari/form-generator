@@ -91,7 +91,11 @@ const SifarisForm = () => {
                 e.preventDefault();
                 groupField.append({
                   groupName: "group name",
-                  inputRows: [],
+                  inputRows: [
+                    {
+                      inputfields: [],
+                    },
+                  ],
                 });
               }}
             >
