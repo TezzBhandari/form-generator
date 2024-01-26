@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { CreateSifarisForm, Field } from "../types";
+import { FormProvider, useForm, useFormContext, useWatch } from "react-hook-form";
+import type { CreateSifarisForm, Field, InputRow } from "../types";
 import EmailField from "./InputFields/EmailField";
 import NumberField from "./InputFields/NumberField";
 import DateField from "./InputFields/DateField";
@@ -30,6 +30,29 @@ const data: CreateSifarisForm["inputGroups"] = [
             placeholder: "Ram Bahadur",
           },
         ],
+      },
+    ],
+  },
+];
+
+const data2: Array<InputRow> = [
+  {
+    inputfields: [
+      {
+        id: "1",
+        label: "email",
+        type: "email",
+        name: "email",
+        required: true,
+        placeholder: "doe@gmail.com",
+      },
+      {
+        id: "2",
+        label: "fullname",
+        type: "text",
+        name: "fullname",
+        required: true,
+        placeholder: "Ram Bahadur",
       },
     ],
   },
@@ -79,13 +102,29 @@ function renderField([name, fieldAttribute]: [string, Field]) {
   return <div>Unknown Type</div>;
 }
 
-const RenderField = () => {
+const RenderField = ({
+  inputRowIndex,
+  groupIndex
+}: {
+  inputRowIndex: number; groupIndex: number;
+}) => {
+
+  const sifarisForm = useFormContext<CreateSifarisForm>();
+
+  const watchInputRows = useWatch({
+    control: sifarisForm.control,
+    name: `inputGroups.${groupIndex}.inputRows.${inputRowIndex}`, // without supply name will watch the entire form, or ['firstName', 'lastName'] to watch both
+    // defaultValue: {
+
+    // }, // default value before the render
+  });
+
+  console.log("watch:", watchInputRows);
   // const form = useForm<CreateSifarisForm>();
   return (
-    <>
+    <div>
       {/* <FormProvider {...form}> */}
-      <div>
-        {data.map((inputGroup, inputGroupIndex) => {
+      {/* {data.map((inputGroup, inputGroupIndex) => {
           return inputGroup.inputRows.map((inputRow, inputRowIndex) => {
             return (
               <div
@@ -106,11 +145,30 @@ const RenderField = () => {
               </div>
             );
           });
-        })}
+        })} */}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${watchInputRows.inputfields.length}, 1fr)`,
+          gap: "1.5rem",
+        }}
+      >
+        {
+
+          Array.isArray(watchInputRows.inputfields)
+            ? watchInputRows.inputfields
+              .map((field) => {
+                return [field.name as string, field] as [string, Field];
+              })
+              .map(renderField)
+            : Object.entries(watchInputRows.inputfields).map(renderField)
+
+        }
+
       </div>
-      {/* </FormProvider> */}
-    </>
-  );
+    </div>
+  )
 };
 
 export default RenderField;

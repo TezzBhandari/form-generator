@@ -24,7 +24,7 @@ const Modal = ({
     <>
       <Transition appear show={isOpen} as={React.Fragment}>
         {/* BACKDROP OVERLAY  */}
-        <Dialog as="div" onClose={onClose} className="w-full bg-red-400">
+        <Dialog as="div" onClose={onClose} className="w-full">
           <Transition.Child
             as={React.Fragment}
             enter="ease-out duration-300"

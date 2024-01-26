@@ -5,6 +5,7 @@ import { CreateSifarisForm } from "../types";
 import InputRowC from "./InputRow";
 
 const SifarisForm = () => {
+
   const sifarisFormCreator = useForm<CreateSifarisForm>({
     defaultValues: {
       formName: "Form Name",
@@ -31,8 +32,11 @@ const SifarisForm = () => {
   return (
     <FormProvider {...sifarisFormCreator}>
       <form
-        onSubmit={sifarisFormCreator.handleSubmit((data) =>
+        onSubmit={sifarisFormCreator.handleSubmit((data) => {
           alert(JSON.stringify(data))
+          const filteredData = { formName: data.formName, inputGroups: data.inputGroups }
+          alert(JSON.stringify(filteredData))
+        }
         )}
       >
         {/* INPUT FORM NAME SECTION  */}
@@ -50,8 +54,6 @@ const SifarisForm = () => {
         {/* GROUP CONTAINER  */}
         <div className="border border-red-400 rounded-xl flex flex-col gap-2 px-3 py-4">
           {groupField.fields.map((group, groupIndex) => {
-            console.log(groupField.fields);
-            console.log(group);
             return (
               // INDIVIDUAL GROUP
               <div
@@ -77,34 +79,6 @@ const SifarisForm = () => {
                 </button>
                 {/* row container  */}
                 <InputRowC groupIndex={groupIndex} />
-                {group.inputRows.map((inputRow, inputRowIndex) => {
-                  // row container
-                  return (
-                    <div className="hidden" key={inputRowIndex}>
-                      {/* each rwo  */}
-                      <div>hello</div>
-                      {/* add input button container  */}
-                      <div>
-                        <button>add another input</button>
-                      </div>
-                    </div>
-                  );
-                })}
-                <div className="hidden">
-                  <div
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // console.log("opening a modal to create a form");
-                      // onOpen();
-                    }}
-                    className="p-8 border-2 hover:cursor-pointer hover:bg-gray-300 border-dashed m-1 rounded-xl border-red-400"
-                  >
-                    <p className="flex items-center justify-center gap-4">
-                      <span>Add icon</span>
-                      <span>Add Field</span>
-                    </p>
-                  </div>
-                </div>
               </div>
             );
           })}
@@ -125,7 +99,8 @@ const SifarisForm = () => {
             </button>
           </div>
         </div>
-        <button>submit</button>
+        {/* FORM SUBMISSION BUTTON  */}
+        <button type="submit">submit</button>
       </form>
     </FormProvider>
   );

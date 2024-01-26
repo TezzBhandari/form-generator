@@ -1,17 +1,31 @@
-import React from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import React, { useState } from "react";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import type { CreateSifarisForm, InputRow } from "../types";
 import RenderField from "./RenderField";
+import InputFieldFormModal from "./InputFieldFormModal";
 
 const InputRowC = ({ groupIndex }: { groupIndex: number }) => {
-  const form = useFormContext<CreateSifarisForm>();
+  const [isFieldFormOpen, setIsFieldFormOpen] = useState(false);
+
+
+  const openFieldForm = () => {
+    setIsFieldFormOpen(true);
+  };
+
+  const closeFieldForm = () => {
+    setIsFieldFormOpen(false);
+  };
+
+  const sifarisForm = useFormContext<CreateSifarisForm>();
 
   const inputRowsField = useFieldArray({
-    control: form.control,
+    control: sifarisForm.control,
     name: `inputGroups.${groupIndex}.inputRows`,
   });
 
-  console.log("inputrows: ", inputRowsField.fields);
+
+
+  // console.log("inputrows: ", inputRowsField.fields);
 
   return (
     <div className="border border-blue-400 p-3 rounded-md my-2">
@@ -21,11 +35,12 @@ const InputRowC = ({ groupIndex }: { groupIndex: number }) => {
             key={inputRow.id}
             className="relative border p-6 m-3 rounded-md "
           >
-            <RenderField />
+            <RenderField inputRowIndex={inputRowIndex} groupIndex={groupIndex} />
             <button
               className="px-2 py-1 border rounded-md"
               onClick={(e) => {
                 e.preventDefault();
+                openFieldForm()
               }}
             >
               add field
@@ -39,6 +54,14 @@ const InputRowC = ({ groupIndex }: { groupIndex: number }) => {
             >
               x
             </span>
+            {/* // MODAL FORM */}
+            <InputFieldFormModal
+
+              isOpen={isFieldFormOpen}
+              onClose={closeFieldForm}
+              groupIndex={groupIndex}
+              inputRowIndex={inputRowIndex}
+            />
           </div>
         );
       })}
