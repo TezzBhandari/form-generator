@@ -1,7 +1,6 @@
 "use client";
-import * as crypto from "crypto";
 
-import React, { useId, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
     Controller,
     useFieldArray,
@@ -11,7 +10,7 @@ import {
 } from "react-hook-form";
 
 // INTERNAL API OR RESOURCE IMPORT
-import { FieldSchema, CreateSifarisForm, Field } from "../types";
+import type { FieldSchema, CreateSifarisForm, Field, EditModalData } from "../types";
 import ListBox from "@/components/ListBox";
 import { Modal } from "@/components/Modal";
 import { InputField } from "@/components/InputField";
@@ -23,10 +22,11 @@ export interface InputFieldFormModalProps {
     onClose: () => void;
     groupIndex: number;
     inputRowIndex: number;
+    editModalData: EditModalData | null;
 }
 
 // random id generator
-function generateUniqueId(): string {
+export function generateUniqueId(): string {
     // Generate a timestamp (number of milliseconds since the Unix epoch)
     const timestamp = new Date().getTime();
 
@@ -45,18 +45,20 @@ const InputFieldFormModal = ({
     isOpen,
     onClose,
     groupIndex,
-    inputRowIndex
+    inputRowIndex,
+    editModalData
 }: InputFieldFormModalProps) => {
 
     // form create form context accessor
-    const { control: formCreatorControl } = useFormContext<CreateSifarisForm>();
-    // dynmic input field
-    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
-        control: formCreatorControl, // control props comes from useForm (optional: if you are using FormContext)
-        name: `inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields`, // unique name for your Field Array
+    const sifarisForm = useFormContext<CreateSifarisForm>();
+    console.log('mot: ', editModalData)
+
+    const inputFields = useFieldArray({
+        control: sifarisForm.control,
+        name: `inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields`
     });
 
-    // react-hook form configuaration for the input modal
+    // react-hook form configuaration for the input field form
     const { register, reset, control, setValue, handleSubmit } = useForm<Field>({
         defaultValues: {
             type: "text",
@@ -69,8 +71,24 @@ const InputFieldFormModal = ({
         },
     });
 
+    if (editModalData !== null) {
+        setValue("id", editModalData.inputFieldEditData.id)
+        setValue("name", editModalData.inputFieldEditData.name)
+        setValue("label", editModalData.inputFieldEditData.label)
+        setValue("placeholder", editModalData.inputFieldEditData.placeholder)
+        setValue("required", editModalData.inputFieldEditData.required)
+        setValue("type", editModalData.inputFieldEditData.type)
+
+    } else {
+        console.log('we are creating not editing')
+
+    }
+
+
     useEffect(() => {
-        setValue(`id`, generateUniqueId())
+        if (editModalData === null) {
+            setValue(`id`, generateUniqueId())
+        }
     }, [generateUniqueId])
 
     // data to show in type dropdown list
@@ -126,11 +144,7 @@ const InputFieldFormModal = ({
                             <InputLabel labelName={"Input Label"} />
                             <InputField {...register("label", { required: true })} />
                         </div>
-                        {/* ID OF THE INPUT FIELD  */}
-                        {/* <div>
-              <InputLabel labelName={"Input Id"} />
-              <InputField />
-            </div> */}
+
                         {/* VALIDATION: IS INPUT FIELD REQURIED */}
                         <div className="flex flex-col">
                             <InputLabel labelName={"required"} />
@@ -162,18 +176,31 @@ const InputFieldFormModal = ({
 
                         {/* SUBMIT BUTTON  */}
                         <button type="button" onClick={handleSubmit((data) => {
-                            append({
-                                id: data.id,
-                                label: data.label,
-                                name: data.name,
-                                required: data.required,
-                                placeholder: data.placeholder as string,
-                                type: data.type,
-                            });
+
+                            if (editModalData === null) {
+                                inputFields.append({
+                                    // @ts-expect-error
+                                    id: data.id,
+                                    label: data.label,
+                                    name: data.name,
+                                    required: data.required,
+                                    placeholder: data.placeholder as string,
+                                    type: data.type,
+                                });
+                            } else {
+                                console.log("about to edit data", editModalData);
+                                sifarisForm.setValue(`inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields.${editModalData.inputFieldIndex}.id`, editModalData.inputFieldEditData.id)
+                                sifarisForm.setValue(`inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields.${editModalData.inputFieldIndex}.name`, data.name)
+                                sifarisForm.setValue(`inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields.${editModalData.inputFieldIndex}.label`, data.label)
+                                sifarisForm.setValue(`inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields.${editModalData.inputFieldIndex}.placeholder`, data.placeholder)
+                                sifarisForm.setValue(`inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields.${editModalData.inputFieldIndex}.required`, data.required)
+                                sifarisForm.setValue(`inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields.${editModalData.inputFieldIndex}.type`, data.type)
+
+                            }
                             reset();
                             onClose();
                         })} className="rounded-md px-3 py-2 bg-[#002147] text-[14px] font-medium border border-[#002147] text-white ">
-                            Save Field
+                            {editModalData === null ? "Save Field" : "Update Field"}
                         </button>
                     </div>
                 </div>

@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
-import { useFormContext } from "react-hook-form";
+// import { useFormContext } from "react-hook-form";
 import { InputLabel } from "@/components/InputLabel";
 import { InputField } from "@/components/InputField";
 import { cn } from "@/lib/utils/classnames";
-import { Field } from "../../types";
+import type { Field } from "../../types";
 
 interface DateFieldProps {
   fieldAttribute: Field;
@@ -15,7 +15,7 @@ interface DateFieldProps {
 }
 
 const DateField = ({ fieldAttribute, name, className }: DateFieldProps) => {
-  const { register } = useFormContext();
+  // const { register } = useFormContext();
   const { id, label, type, required, ...rest } = fieldAttribute;
   return (
     <>
@@ -26,8 +26,7 @@ const DateField = ({ fieldAttribute, name, className }: DateFieldProps) => {
           className="bg-white"
           type="date"
           {...rest}
-          {...register(name, { required: required })}
-          id={id}
+        // {...register(name, { required: required })}
         />
       </div>
     </>

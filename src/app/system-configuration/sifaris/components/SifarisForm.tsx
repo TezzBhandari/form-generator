@@ -1,8 +1,8 @@
 "use client";
 
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { CreateSifarisForm } from "../types";
-import InputRowC from "./InputRow";
+import type { CreateSifarisForm } from "../types";
+import InputRowList from "./InputRowList";
 
 const SifarisForm = () => {
 
@@ -22,6 +22,10 @@ const SifarisForm = () => {
     },
   });
 
+
+  // @ts-e
+  // const groups = sifarisFormCreator.watch("inputGroups", [])
+
   // for dynamic field
   // dynamic group
   const groupField = useFieldArray({
@@ -34,8 +38,6 @@ const SifarisForm = () => {
       <form
         onSubmit={sifarisFormCreator.handleSubmit((data) => {
           alert(JSON.stringify(data))
-          const filteredData = { formName: data.formName, inputGroups: data.inputGroups }
-          alert(JSON.stringify(filteredData))
         }
         )}
       >
@@ -68,6 +70,14 @@ const SifarisForm = () => {
                   )}
                   placeholder="Enter a group name"
                 />
+
+                {
+                  groupIndex <= 0 ? null : <button className="px-2 py-1 bg-[#eee] text-black font-semibold rounded-md absolute top-1 right-10" onClick={(e) => {
+                    e.preventDefault();
+                    groupField.swap(groupIndex, groupIndex - 1)
+                  }}>up</button>
+                }
+
                 <button
                   onClick={(e) => {
                     e.preventDefault();
@@ -78,7 +88,7 @@ const SifarisForm = () => {
                   {"x"}
                 </button>
                 {/* row container  */}
-                <InputRowC groupIndex={groupIndex} />
+                <InputRowList groupIndex={groupIndex} />
               </div>
             );
           })}
@@ -99,7 +109,7 @@ const SifarisForm = () => {
                 });
               }}
             >
-              Add another Row
+              Add another group
             </button>
           </div>
         </div>

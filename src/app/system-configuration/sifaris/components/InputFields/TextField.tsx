@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
-import { Field } from "../types";
+import { Field } from "../../types";
 import { InputLabel } from "@/components/InputLabel";
 import { InputField } from "@/components/InputField";
 import { cn } from "@/lib/utils/classnames";
-import { useFormContext } from "react-hook-form";
 
 interface TextFieldProps {
   fieldAttribute: Field;
@@ -15,7 +14,7 @@ interface TextFieldProps {
 }
 
 const TextField = ({ fieldAttribute, name, className }: TextFieldProps) => {
-  const { register } = useFormContext();
+  // const { register } = useFormContext();
   const { id, label, type, required, ...rest } = fieldAttribute;
   return (
     <>
@@ -26,8 +25,7 @@ const TextField = ({ fieldAttribute, name, className }: TextFieldProps) => {
           className="bg-white"
           type="text"
           {...rest}
-          {...register(name, { required: required })}
-          id={id}
+        // {...register(name, { required: required })}
         />
       </div>
     </>

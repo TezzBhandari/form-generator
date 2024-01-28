@@ -42,7 +42,7 @@ interface InputFormField {
 }
 
 // input row structure
-interface InputRow {
+interface InputRowType {
   inputfields: Array<Field> | Fields;
 }
 
@@ -50,12 +50,20 @@ interface InputRow {
 
 interface InputGroup {
   groupName: string;
-  inputRows: Array<InputRow>;
+  inputRows: Array<InputRowType>;
 }
 
 interface CreateSifarisForm {
   formName: string;
   inputGroups: Array<InputGroup>;
+}
+
+// editing field form
+interface EditModalData {
+  inputFieldIndex: number;
+  // rowIndex: number;
+  // groupIndex: number;
+  inputFieldEditData: Field;
 }
 
 export type {
@@ -65,7 +73,9 @@ export type {
   DateField,
   NumberField,
   Field,
+  EditModalData,
+  Fields,
   InputFormField,
-  InputRow,
+  InputRowType,
   CreateSifarisForm,
 };

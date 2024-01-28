@@ -1,70 +1,22 @@
 "use client";
 import React from "react";
-import { FormProvider, useForm, useFormContext, useWatch } from "react-hook-form";
-import type { CreateSifarisForm, Field, InputRow } from "../types";
+import Image from "next/image";
+import type { CreateSifarisForm, EditModalData, Field, Fields } from "../types";
 import EmailField from "./InputFields/EmailField";
 import NumberField from "./InputFields/NumberField";
 import DateField from "./InputFields/DateField";
 import TextField from "./InputFields/TextField";
+import DeleteIcon from "@/../public/assets/logo/DeleteIcon.svg"
+import EditIcon from "@/../public/assets/logo/EditIcon.svg"
+import { useFieldArray, useFormContext } from "react-hook-form";
 
-const data: CreateSifarisForm["inputGroups"] = [
-  {
-    groupName: "group 1",
-    inputRows: [
-      {
-        inputfields: [
-          {
-            id: "1",
-            label: "email",
-            type: "email",
-            name: "email",
-            required: true,
-            placeholder: "doe@gmail.com",
-          },
-          {
-            id: "2",
-            label: "fullname",
-            type: "text",
-            name: "fullname",
-            required: true,
-            placeholder: "Ram Bahadur",
-          },
-        ],
-      },
-    ],
-  },
-];
 
-const data2: Array<InputRow> = [
-  {
-    inputfields: [
-      {
-        id: "1",
-        label: "email",
-        type: "email",
-        name: "email",
-        required: true,
-        placeholder: "doe@gmail.com",
-      },
-      {
-        id: "2",
-        label: "fullname",
-        type: "text",
-        name: "fullname",
-        required: true,
-        placeholder: "Ram Bahadur",
-      },
-    ],
-  },
-];
 
 // renders input field
-function renderField([name, fieldAttribute]: [string, Field], fieldIndex: number) {
-  console.log('fieldIndex: ', fieldIndex)
+function renderField([name, fieldAttribute]: [string, Field]) {
   if (fieldAttribute.type === "text") {
     return (
       <TextField
-        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />
@@ -74,7 +26,6 @@ function renderField([name, fieldAttribute]: [string, Field], fieldIndex: number
   if (fieldAttribute.type === "number") {
     return (
       <NumberField
-        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />
@@ -84,7 +35,6 @@ function renderField([name, fieldAttribute]: [string, Field], fieldIndex: number
   if (fieldAttribute.type === "email") {
     return (
       <EmailField
-        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />
@@ -94,7 +44,6 @@ function renderField([name, fieldAttribute]: [string, Field], fieldIndex: number
   if (fieldAttribute.type === "date") {
     return (
       <DateField
-        key={fieldIndex}
         fieldAttribute={fieldAttribute}
         name={name}
       />
@@ -105,70 +54,88 @@ function renderField([name, fieldAttribute]: [string, Field], fieldIndex: number
 
 const RenderField = ({
   inputRowIndex,
-  groupIndex
+  groupIndex,
+  openEditFieldModal
 }: {
-  inputRowIndex: number; groupIndex: number;
+  inputRowIndex: number;
+  groupIndex: number;
+  openEditFieldModal: (editData: EditModalData) => void;
 }) => {
 
+
+  // form create form context accessor
   const sifarisForm = useFormContext<CreateSifarisForm>();
 
-  const watchInputRows = useWatch({
-    control: sifarisForm.control,
-    name: `inputGroups.${groupIndex}.inputRows.${inputRowIndex}`, // without supply name will watch the entire form, or ['firstName', 'lastName'] to watch both
-    // defaultValue: {
+  // @ts-expect-error
+  const inputFields = sifarisForm.watch(`inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields`, [])
 
-    // }, // default value before the render
+  const { remove } = useFieldArray({
+    control: sifarisForm.control,
+    name: `inputGroups.${groupIndex}.inputRows.${inputRowIndex}.inputfields`
   });
 
-  console.log("watch:", watchInputRows);
-  // const form = useForm<CreateSifarisForm>();
-  return (
-    <div>
-      {/* <FormProvider {...form}> */}
-      {/* {data.map((inputGroup, inputGroupIndex) => {
-          return inputGroup.inputRows.map((inputRow, inputRowIndex) => {
-            return (
-              <div
-                key={inputRowIndex}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: `repeat(${inputRow.inputfields.length}, 1fr)`,
-                  gap: "1.5rem",
-                }}
-              >
-                {Array.isArray(inputRow.inputfields)
-                  ? inputRow.inputfields
-                      .map((field) => {
-                        return [field.name as string, field] as [string, Field];
-                      })
-                      .map(renderField)
-                  : Object.entries(inputRow.inputfields).map(renderField)}
-              </div>
-            );
-          });
-        })} */}
 
+  return (
+    <>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: `repeat(${watchInputRows.inputfields.length}, 1fr)`,
+          gridTemplateColumns: `repeat(${inputFields.length}, 1fr)`,
           gap: "1.5rem",
         }}
       >
         {
 
-          Array.isArray(watchInputRows.inputfields)
-            ? watchInputRows.inputfields
+          Array.isArray(inputFields)
+            ? inputFields
               .map((field) => {
-                return [field.name as string, field] as [string, Field];
-              })
-              .map(renderField)
-            : Object.entries(watchInputRows.inputfields).map(renderField)
+                return [field.name, field] as [string, Field];
+              }).map(([name, fieldAttribute], fieldIndex) => {
+                return (
+                  <div
+                    key={fieldAttribute.id}
+                    className="flex items-center gap-4"
+                  >
+                    <div className="flex-1">
+                      {renderField([name, fieldAttribute])}
+                    </div>
+                    <div className="flex flex-col gap-1">
 
+                      <span
+                        className="p-1 border cursor-pointer"
+                        onClick={() => {
+                          openEditFieldModal({
+                            inputFieldIndex: fieldIndex,
+                            inputFieldEditData: fieldAttribute,
+                          });
+                        }}
+                      >
+                        <Image
+                          src={EditIcon}
+                          alt={"Edit Icon for editing field"}
+                        />
+                      </span>
+                      <span
+                        className="p-1 border cursor-pointer"
+                        onClick={() => remove(fieldIndex)}
+                      >
+                        <Image
+                          src={DeleteIcon}
+                          alt={"Delete Icon for deleting field"}
+                        />
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+
+            // .map(renderField)
+            // this part is not required here but need for a library build 
+            : Object.entries(inputFields).map(renderField)
         }
 
       </div>
-    </div>
+    </>
   )
 };
 
